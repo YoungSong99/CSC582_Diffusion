@@ -1,0 +1,67 @@
+experiment:
+  name: conditional_ddpm_type1
+  seed: 42
+
+# Data Processing
+dataset:
+  fuzzy_cutoff: 30
+  cols_to_keep:
+    - name
+    - _name_clean
+    - type1
+    - type2
+    - primary_color
+    - shape
+    - legendary
+    - mega_evolution
+    - alolan_form
+    - galarian_form
+    - gigantamax
+    - Height
+    - Weight
+    - image_fn
+  cat_cols:
+    - type1
+    - type2
+    - primary_color
+    - shape
+
+
+# Image Manifest
+sprites_root: data/01_raw/pokemon_sprites_csv/pokemon_images/sprites
+library_roots:
+  - data/01_raw/pokemon_gen_one_images/dataset
+  - data/01_raw/pokemon_library_images/Pokemon Dataset/Pokemon Dataset
+  - data/01_raw/pokemon_sprites_csv/pokemon_images
+
+
+data:
+  image_size: 64
+  channels: 3
+  batch_size: 32
+  shuffle_buffer: 1000
+
+training:
+  epochs: 20
+  learning_rate: 0.0002
+  save_path: data/06_models/conditional_ddpm.keras
+
+diffusion:
+  timesteps: 1000
+  beta_start: 0.0001
+  beta_end: 0.02
+
+model:
+  hidden_channels: 64
+  time_embedding_dim: 128
+  label_embedding_dim: 128
+
+sampling:
+  num_samples: 16
+  condition_label: fire
+  save_dir: data/08_reporting/samples
+
+wandb:
+  project: pokemon-generation
+  run_name: conditional_ddpm_type1
+  use_wandb: true

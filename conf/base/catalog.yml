@@ -1,0 +1,21 @@
+# Here you can define all your datasets by using simple YAML syntax.
+#
+# Documentation for this file format can be found in "The Data Catalog"
+# Link: https://docs.kedro.org/en/stable/catalog-data/introduction/#data-catalog
+
+
+pokedex:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/pokemon_sprites_csv/pokemon_images/pokedex.csv
+
+pokemon_db:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/pokemon_library_images/pokemonDB_dataset.csv
+
+cleaned_dataset:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/cleaned_dataset.csv
+
+image_manifest:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/image_manifest.csv
