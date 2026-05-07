@@ -17,72 +17,115 @@ def normalize_node(pokedex: pd.DataFrame, db: pd.DataFrame):
     return pokedex, db
 
 
-def remove_name_adj(name):
+def norm_db(name: str) -> str:
+
     if pd.isna(name):
         return ""
-    
-    name = str(name).lower()
-    
-    stopwords = [
-        'mega', 'galarian', 'alolan', 'hisuian', 'paldean', 
-        'standard', 'mode', 'zen', 'normal', 'attack', 'defense', 
-        'origin', 'therian', 'crowned', 'shield', 'sword', 'form', 'forme',
-        'two-segment', 'ice face', 'zen mode', 'gigantamax'
+
+    # unicode normalize
+    name = (
+        name.replace("é", "e")
+        .replace("♀", " female")
+        .replace("♂", " male")
+    )
+
+    # remove parentheses
+    name = re.sub(r"\(.*?\)", "", name)
+    name = name.lower().strip()
+
+    # keep only alnum + space
+    name = re.sub(r"[^a-z0-9 ]", "", name)
+
+    # prefix → suffix
+    prefixes = [
+        ("mega ", " mega"),
+        ("galarian ", " galar"),
+        ("hisuian ", " hisui"),
+        ("alolan ", " alola"),
+        ("primal ", " primal"),
+        ("own tempo ", " own tempo"),
+        ("heat ", " heat"),
+        ("wash ", " wash"),
+        ("frost ", " frost"),
+        ("fan ", " fan"),
+        ("mow ", " mow"),
+        ("white ", " white"),
+        ("black ", " black"),
+        ("ash ", " ash"),
+        ("dusk mane ", " dusk mane"),
+        ("dawn wings ", " dawn wings"),
+        ("ultra ", " ultra"),
     ]
-    
-    pattern = r'\b(' + '|'.join(stopwords) + r')\b'
-    name = re.sub(pattern, '', name)
-    
-    name = re.sub(r'[^a-z0-9]', ' ', name) 
-    name = ' '.join(name.split())
-    
-    return name
+
+    for prefix, suffix in prefixes:
+        if name.startswith(prefix):
+            name = name[len(prefix):] + suffix
+            break
+
+    # remove noisy words
+    remove_words = [
+        " forme",
+        " form",
+        " style",
+        " mode",
+        " face",
+        " cloak",
+        " size",
+        " hero of many battles",
+        " crowned sword",
+        " crowned shield",
+    ]
+
+    for word in remove_words:
+        name = name.replace(word, "")
+
+    # special cases
+    name = (
+        name.replace(" crowned sword", " crowned")
+        .replace(" crowned shield", " crowned")
+    )
+
+    return re.sub(r"\s+", " ", name).strip()
 
 
-def merge_node(pokedex, db, cutoff=85):
+def norm_dex(name: str) -> str:
 
-    merged = db.merge(pokedex, on="_name", how="left")
+    if pd.isna(name):
+        return ""
 
-    merged["_name_clean"] = merged["_name"].apply(remove_name_adj)
+    name = name.replace("é", "e").lower().strip()
 
-    ref = merged.dropna(subset=["type1", "primary_color", "shape"])
-    ref_names = ref["name"].unique().tolist()
+    name = re.sub(r"[^a-z0-9 ]", "", name)
 
-    mask = merged[["type1", "primary_color", "shape"]].isna().any(axis=1)
+    name = (
+        name.replace(" totem", "")
+        .replace(" gmax", "")
+        .replace(" eternamax", "")
+    )
 
-    for idx in merged[mask].index:
+    name = re.sub(r"nidoran f$", "nidoran female", name)
+    name = re.sub(r"nidoran m$", "nidoran male", name)
 
-        q = merged.at[idx, "_name_clean"]
-        if not q:
-            continue
+    return re.sub(r"\s+", " ", name).strip()
 
-        match = process.extractOne(
-            q,
-            ref_names,
-            scorer=fuzz.token_sort_ratio
-        )
 
-        if not match:
-            continue
+def merge_node(pokedex, db):
+    pokedex = pokedex.copy()
+    db = db.copy()
 
-        best, score, _ = match
+    pokedex["_key"] = pokedex["name"].apply(norm_dex)
+    db["_key"] = db["_name"].apply(norm_db)
 
-        if score >= cutoff:
-
-            row = ref[ref["name"] == best].iloc[0]
-
-            merged.at[idx, "name"] = row["name"]
-            merged.at[idx, "type1"] = row["type1"]
-            merged.at[idx, "type2"] = row["type2"]
-            merged.at[idx, "primary_color"] = row["primary_color"]
-            merged.at[idx, "shape"] = row["shape"]
+    merged = pokedex.merge(
+        db,
+        on="_key",
+        how="left",
+    )
 
     return merged
 
 
 def clean_node(df: pd.DataFrame, cols_to_keep: list) -> pd.DataFrame:
-
-    df = df[cols_to_keep].copy()
 
     df.columns = (
         df.columns
@@ -91,6 +134,8 @@ def clean_node(df: pd.DataFrame, cols_to_keep: list) -> pd.DataFrame:
         .str.replace(' ', '_')   
         .str.replace(r'[^a-z0-9_]', '', regex=True)
     )
+
+    df = df[cols_to_keep].copy()
 
     return df
 

@@ -20,8 +20,8 @@ def create_pipeline(**kwargs) -> Pipeline:
 
             node(
                 func=merge_node,
-                inputs=["pokedex_norm", "db_norm", "params:dataset.fuzzy_cutoff"],
-                outputs="merged",
+                inputs=["pokedex_norm", "db_norm"],
+                outputs= "merged",
                 name="merge_node",
             ),
 
@@ -35,7 +35,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=encode_node,
                 inputs=["cleaned", "params:dataset.cat_cols"],
-                outputs=["cleaned_dataset", "encoders"],
+                outputs=["cleaned_dataset", "label_encoders"],
                 name="encode_node",
             ),
         ]

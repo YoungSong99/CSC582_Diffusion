@@ -16,6 +16,11 @@ cleaned_dataset:
   type: kedro_datasets.pandas.CSVDataset
   filepath: data/02_intermediate/cleaned_dataset.csv
 
-image_manifest:
+label_encoders:
+  type: json.JSONDataset
+  filepath: data/02_intermediate/label_encoders.json
+
+final_dataset:
   type: kedro_datasets.pandas.CSVDataset
-  filepath: data/02_intermediate/image_manifest.csv
+  filepath: data/03_primary/final_dataset.csv
+

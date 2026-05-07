@@ -1,6 +1,4 @@
 from pathlib import Path
-import pandas as pd
-import ast
 
 
 IMG_EXTS = {".png", ".jpg", ".jpeg"}
@@ -27,11 +25,9 @@ def build_sprite_index(sprites_root: str):
             index[name] = []
 
         index[name].extend(files)
-        print(index)
-
-        break
 
     return index
+
 
 def build_library_index(library_roots: list[str]):
     index = {}
@@ -59,38 +55,26 @@ def build_library_index(library_roots: list[str]):
     return index
 
 
-def build_image_manifest(df: pd.DataFrame, sprites_root: str, library_roots: list[str],):
+def merge_paths(row):
+    sprite = row["sprite_paths"] if isinstance(row["sprite_paths"], list) else []
+    library = row["library_paths"] if isinstance(row["library_paths"], list) else []
+    return sprite + library
+
+
+def image_manifest_node(df, sprites_root: str, library_roots: list[str]):
 
     sprite_index = build_sprite_index(sprites_root)
     library_index = build_library_index(library_roots)
 
+    def get_sprite_path(key):
+        return sprite_index.get(key, [])
 
-    def resolve_sprite(row):
-        try:
-            fn = ast.literal_eval(row["image_fn"])[0]
-            key = (
-                f"{int(row.name):04d}",
-                str(row["name"]).lower(),
-                str(row["pokedex_id"]),
-                fn
-            )
-            return sprite_index.get(key, None)
-        except:
-            return None
+    def get_library_path(key):
+        return library_index.get(key, [])
 
-    df["sprite_path"] = df.apply(resolve_sprite, axis=1)
+    df["sprite_paths"] = df["_key"].apply(get_sprite_path)
+    df["library_paths"] = df["_key"].apply(get_library_path)
 
-    def clean_name(name):
-        return str(name).split(" ")[0].lower()
-
-    df["base_name"] = df["name"].apply(clean_name)
-    df["library_paths"] = df["base_name"].map(library_index)
-
-    df["library_paths"] = df["library_paths"].apply(
-        lambda x: x if isinstance(x, list) else []
-    )
-
-    print("sprite:", df["sprite_path"].notna().sum())
-    print("library:", df["library_paths"].apply(len).gt(0).sum())
+    df["image_paths"] = df.apply(merge_paths, axis=1)
 
     return df
