@@ -4,7 +4,7 @@ from .nodes import (
     normalize_node,
     merge_node,
     clean_node,
-    encode_node,
+    image_manifest_node
 )
 
 
@@ -27,16 +27,22 @@ def create_pipeline(**kwargs) -> Pipeline:
 
             node(
                 func=clean_node,
-                inputs=["merged", "params:dataset.cols_to_keep"],
-                outputs="cleaned",
+                inputs=["merged", 
+                        "params:dataset.cols_to_keep",
+                        "params:dataset.cat_cols"],
+                outputs=["cleaned", "label_encoders"],
                 name="clean_node",
             ),
 
             node(
-                func=encode_node,
-                inputs=["cleaned", "params:dataset.cat_cols"],
-                outputs=["cleaned_dataset", "label_encoders"],
-                name="encode_node",
+                func=image_manifest_node,
+                inputs=[
+                    "cleaned",
+                    "params:sprites_root",
+                    "params:library_roots",
+                ],
+                outputs= "merged_dataset",
+                name="image_manifest_node",
             ),
         ]
     )

@@ -2,7 +2,7 @@ experiment:
   name: conditional_ddpm_type1
   seed: 42
 
-# Data Processing
+# Data Ingestion
 dataset:
   fuzzy_cutoff: 30
   cols_to_keep:
@@ -61,8 +61,6 @@ dataset:
     - primary_color
     - shape
 
-
-# Image Manifest
 sprites_root: data/01_raw/pokemon_sprites_csv/pokemon_images/sprites
 library_roots:
   - data/01_raw/pokemon_gen_one_images/dataset

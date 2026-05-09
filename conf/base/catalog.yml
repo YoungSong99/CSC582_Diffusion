@@ -12,15 +12,11 @@ pokemon_db:
   type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/pokemon_library_images/pokemonDB_dataset.csv
 
-cleaned_dataset:
-  type: kedro_datasets.pandas.CSVDataset
-  filepath: data/02_intermediate/cleaned_dataset.csv
-
 label_encoders:
-  type: json.JSONDataset
+  type: kedro_datasets.json.JSONDataset
   filepath: data/02_intermediate/label_encoders.json
 
-final_dataset:
+merged_dataset:
   type: kedro_datasets.pandas.CSVDataset
-  filepath: data/03_primary/final_dataset.csv
+  filepath: data/02_intermediate/dataset.csv
 
