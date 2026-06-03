@@ -4,19 +4,30 @@
 # Link: https://docs.kedro.org/en/stable/catalog-data/introduction/#data-catalog
 
 
-pokedex:
-  type: kedro_datasets.pandas.CSVDataset
-  filepath: data/01_raw/pokemon_sprites_csv/pokemon_images/pokedex.csv
+cleaned_manifest:
+  type: pandas.CSVDataset
+  filepath: data/03_primary/pokemon_sprites/pokedex.csv
 
-pokemon_db:
-  type: kedro_datasets.pandas.CSVDataset
-  filepath: data/01_raw/pokemon_library_images/pokemonDB_dataset.csv
+checked_manifest:
+  type: pandas.CSVDataset
+  filepath: data/03_primary/checked_manifest.csv
 
-label_encoders:
-  type: kedro_datasets.json.JSONDataset
-  filepath: data/02_intermediate/label_encoders.json
+encoded_manifest:
+  type: pandas.CSVDataset
+  filepath: data/04_feature/encoded_manifest.csv
 
-merged_dataset:
-  type: kedro_datasets.pandas.CSVDataset
-  filepath: data/02_intermediate/dataset.csv
+label_mappings:
+  type: json.JSONDataset
+  filepath: data/04_feature/label_encoders/label_mappings.json
 
+train_manifest:
+  type: pandas.CSVDataset
+  filepath: data/05_model_input/train_manifest.csv
+
+val_manifest:
+  type: pandas.CSVDataset
+  filepath: data/05_model_input/val_manifest.csv
+
+test_manifest:
+  type: pandas.CSVDataset
+  filepath: data/05_model_input/test_manifest.csv

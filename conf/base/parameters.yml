@@ -2,99 +2,24 @@ experiment:
   name: conditional_ddpm_type1
   seed: 42
 
-# Data Ingestion
-dataset:
-  fuzzy_cutoff: 30
-  cols_to_keep:
-    - _key
-    - type1
-    - type2
-    - primary_color
-    - shape
-    - legendary
-    - mega_evolution
-    - alolan_form
-    - galarian_form
-    - gigantamax
 
-    - height
-    - weight
-    - image_fn
+# conf/base/parameters.yml
 
-    - abilities
-    - ev_yield
-    - catch_rate
-    - base_friendship
-    - base_exp
-    - growth_rate
-    - egg_groups
-    - gender
-    - egg_cycles
+path_col: image_path
+image_root: home/young/projects/pokemon_diffusion/data/03_primary/pokemon_sprites
+label_mapping_save_dir: data/04_feature/label_encoders
 
-    - hp_base
-    - hp_min
-    - hp_max
+label_cols:
+  - type
+  - primary_color
+  - shape
 
-    - attack_base
-    - attack_min
-    - attack_max
+label_col: combined_label
 
-    - defense_base
-    - defense_min
-    - defense_max
+train_size: 0.8
+val_size: 0.1
+test_size: 0.1
+seed: 42
 
-    - special_attack_base
-    - special_attack_min
-    - special_attack_max
-
-    - special_defense_base
-    - special_defense_min
-    - special_defense_max
-
-    - speed_base
-    - speed_min
-    - speed_max
-
-  cat_cols:
-    - type1
-    - type2
-    - primary_color
-    - shape
-
-sprites_root: data/01_raw/pokemon_sprites_csv/pokemon_images/sprites
-library_roots:
-  - data/01_raw/pokemon_gen_one_images/dataset
-  - data/01_raw/pokemon_library_images/Pokemon Dataset/Pokemon Dataset
-  - data/01_raw/pokemon_sprites_csv/pokemon_images
-
-
-data:
-  image_size: 64
-  channels: 3
-  batch_size: 32
-  shuffle_buffer: 1000
-
-training:
-  epochs: 20
-  learning_rate: 0.0002
-  save_path: data/06_models/conditional_ddpm.keras
-
-diffusion:
-  timesteps: 1000
-  beta_start: 0.0001
-  beta_end: 0.02
-
-model:
-  hidden_channels: 64
-  time_embedding_dim: 128
-  label_embedding_dim: 128
-
-sampling:
-  num_samples: 16
-  condition_label: fire
-  save_dir: data/08_reporting/samples
-
-wandb:
-  project: pokemon-generation
-  run_name: conditional_ddpm_type1
-  use_wandb: true
+max_multiplier: 3
+max_samples_per_class: 300

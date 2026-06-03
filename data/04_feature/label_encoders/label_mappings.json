@@ -1,0 +1,46 @@
+{
+  "type": {
+    "Bug": 0,
+    "Dark": 1,
+    "Dragon": 2,
+    "Electric": 3,
+    "Fairy": 4,
+    "Fighting": 5,
+    "Fire": 6,
+    "Flying": 7,
+    "Ghost": 8,
+    "Grass": 9,
+    "Ground": 10,
+    "Ice": 11,
+    "Normal": 12,
+    "Poison": 13,
+    "Psychic": 14,
+    "Rock": 15,
+    "Steel": 16,
+    "Water": 17
+  },
+  "primary_color": {
+    "Blue": 0,
+    "Orange & Brown": 1,
+    "Red": 2,
+    "Red & Purple": 3,
+    "White & Gray": 4,
+    "Yellow & Green": 5
+  },
+  "shape": {
+    "Armor": 0,
+    "Arms": 1,
+    "Ball": 2,
+    "Blob": 3,
+    "Bug-Wings": 4,
+    "Fish": 5,
+    "Heads": 6,
+    "Humanoid": 7,
+    "Legs": 8,
+    "Quadruped": 9,
+    "Squiggle": 10,
+    "Tentacles": 11,
+    "Upright": 12,
+    "Wings": 13
+  }
+}
