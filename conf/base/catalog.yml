@@ -4,30 +4,40 @@
 # Link: https://docs.kedro.org/en/stable/catalog-data/introduction/#data-catalog
 
 
-cleaned_manifest:
+# Prepare Data
+cleaned_metadata:
   type: pandas.CSVDataset
   filepath: data/03_primary/pokemon_sprites/pokedex.csv
 
-checked_manifest:
+checked_metadata:
   type: pandas.CSVDataset
-  filepath: data/03_primary/checked_manifest.csv
+  filepath: data/03_primary/checked_metadata.csv
 
-encoded_manifest:
+encoded_metadata:
   type: pandas.CSVDataset
-  filepath: data/04_feature/encoded_manifest.csv
+  filepath: data/04_feature/encoded_metadata.csv
 
 label_mappings:
   type: json.JSONDataset
   filepath: data/04_feature/label_encoders/label_mappings.json
 
-train_manifest:
+train_metadata:
   type: pandas.CSVDataset
-  filepath: data/05_model_input/train_manifest.csv
+  filepath: data/05_model_input/train_metadata.csv
 
-val_manifest:
+val_metadata:
   type: pandas.CSVDataset
-  filepath: data/05_model_input/val_manifest.csv
+  filepath: data/05_model_input/val_metadata.csv
 
-test_manifest:
+test_metadata:
   type: pandas.CSVDataset
-  filepath: data/05_model_input/test_manifest.csv
+  filepath: data/05_model_input/test_metadata.csv
+
+# AE
+ae_history:
+  type: json.JSONDataset
+  filepath: data/07_model_output/ae_history.json
+
+ae_result_img:
+  type: kedro_datasets.pillow.ImageDataset
+  filepath: data/07_model_output/ae_result_img.png

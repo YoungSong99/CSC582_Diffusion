@@ -1,12 +1,6 @@
-experiment:
-  name: conditional_ddpm_type1
-  seed: 42
-
-
-# conf/base/parameters.yml
-
+# Dataset parameters
 path_col: image_path
-image_root: home/young/projects/pokemon_diffusion/data/03_primary/pokemon_sprites
+image_root: /home/young/projects/pokemon_diffusion/data/03_primary/pokemon_sprites
 label_mapping_save_dir: data/04_feature/label_encoders
 
 label_cols:
@@ -23,3 +17,26 @@ seed: 42
 
 max_multiplier: 3
 max_samples_per_class: 300
+
+# AE
+ae:
+  experiment_name: "ae_m1_tanh_relu"
+  
+  data:
+    img_size: 96
+    batch_size: 128
+    normalization_range: "minus_one_to_one"
+    num_workers: 2
+
+  model:
+    latent_dim: 128
+    base_channels: 32
+    activation: "silu"
+    norm_type: "none"
+    output_activation: "tanh"
+
+  training:
+    learning_rate: 0.0005
+    weight_decay: 0.0001
+    loss: "foreground_l1"
+    epochs: 100
