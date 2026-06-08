@@ -5,6 +5,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from .loss import get_loss_fn
 from torchvision.utils import make_grid
+from torchvision.transforms.functional import to_pil_image
 import wandb
 
 
@@ -44,7 +45,7 @@ def log_reconstruction_images(model, val_loader, device, epoch, params, num_imag
         )
     }, step=epoch)
 
-    return grid
+    return to_pil_image(grid.cpu())
 
 
 def train_one_epoch(model, dataloader, optimizer, loss_fn, device):

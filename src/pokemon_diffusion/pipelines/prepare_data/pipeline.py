@@ -8,9 +8,9 @@ from .nodes import (
 )
 
 """
-data/05_model_input/train_manifest.csv
-data/05_model_input/val_manifest.csv
-data/05_model_input/test_manifest.csv
+data/05_model_input/train_metadata.csv
+data/05_model_input/val_metadata.csv
+data/05_model_input/test_metadata.csv
 data/04_feature/label_encoders/label_mappings.json
 """
 
@@ -18,49 +18,49 @@ def create_pipeline(**kwargs):
     return pipeline([
         node(
             func=check_image_paths,
-            inputs=["cleaned_manifest", "params:path_col", "params:image_root"],
-            outputs="checked_manifest",
+            inputs=["cleaned_metadata", "params:path_col", "params:image_root"],
+            outputs="checked_metadata",
             name="check_image_paths_node",
         ),
         node(
             func=create_combined_label,
-            inputs=["checked_manifest", "params:label_cols"],
-            outputs="manifest_with_combined_label",
+            inputs=["checked_metadata", "params:label_cols"],
+            outputs="metadata_with_combined_label",
             name="create_combined_label_node",
         ),
         node(
             func=encode_labels_before_split,
             inputs=[
-                "manifest_with_combined_label",
+                "metadata_with_combined_label",
                 "params:label_cols",
                 "params:label_mapping_save_dir",
             ],
-            outputs=["encoded_manifest", "label_mappings"],
+            outputs=["encoded_metadata", "label_mappings"],
             name="encode_labels_node",
         ),
         node(
             func=split_dataframe,
             inputs=[
-                "encoded_manifest",
+                "encoded_metadata",
                 "params:label_col",
                 "params:train_size",
                 "params:val_size",
                 "params:test_size",
                 "params:seed",
             ],
-            outputs=["train_manifest_raw", "val_manifest", "test_manifest"],
+            outputs=["train_metadata_raw", "val_metadata", "test_metadata"],
             name="split_dataframe_node",
         ),
         node(
             func=balance_dataframe,
             inputs=[
-                "train_manifest_raw",
+                "train_metadata_raw",
                 "params:label_col",
                 "params:max_multiplier",
                 "params:max_samples_per_class",
                 "params:seed",
             ],
-            outputs="train_manifest",
+            outputs="train_metadata",
             name="balance_train_dataframe_node",
         ),
     ])
