@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-from pokemon_diffusion.models.vae import ConvBlock, DeconvBlock, get_output_activation
+from pokemon_diffusion.models.vae import ConvBlock, DeconvBlock
+from pokemon_diffusion.models.helper import get_activation, get_output_activation, get_norm_layer
 
 class ConditionEmbedding(nn.Module):
     def __init__(self, num_types, num_colors, num_shapes, type_emb_dim=32, color_emb_dim=16, shape_emb_dim=16):

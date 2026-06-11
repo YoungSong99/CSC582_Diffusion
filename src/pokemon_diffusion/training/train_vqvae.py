@@ -53,7 +53,6 @@ def train_one_epoch(model, dataloader, optimizer, recon_loss_fn, device, vq_weig
 
         optimizer.zero_grad()
         recon, vq_loss, indices = model(x)
-        used_codes = torch.unique(indices).numel()
         loss, recon_loss, vq = vqvae_loss(recon, x, vq_loss, recon_loss_fn, vq_weight)
         loss.backward()
         optimizer.step()
@@ -62,28 +61,32 @@ def train_one_epoch(model, dataloader, optimizer, recon_loss_fn, device, vq_weig
         total_loss += loss.item() * bs
         total_recon += recon_loss.item() * bs
         total_vq += vq.item() * bs
-        total_used_codes += used_codes
+        total_used_codes += indices.view(-1).unique().numel()
 
     n = len(dataloader.dataset)
-    return total_loss / n, total_recon / n, total_vq / n, total_used_codes / n
+    avg_used_codes = total_used_codes / len(dataloader)
+    return total_loss / n, total_recon / n, total_vq / n, avg_used_codes
 
 @torch.no_grad()
 def evaluate(model, dataloader, recon_loss_fn, device, vq_weight):
     model.eval()
-    total_loss, total_recon, total_vq = 0.0, 0.0, 0.0
+    total_loss, total_recon, total_vq, total_used_codes = 0.0, 0.0, 0.0, 0.0
 
     for batch in tqdm(dataloader, desc="Evaluating", leave=False):
         x = batch["image"].to(device) if isinstance(batch, dict) else batch[0].to(device)
-        recon, vq_loss, _ = model(x)
+
+        recon, vq_loss, indices = model(x)
         loss, recon_loss, vq = vqvae_loss(recon, x, vq_loss, recon_loss_fn, vq_weight)
 
         bs = x.size(0)
         total_loss += loss.item() * bs
         total_recon += recon_loss.item() * bs
         total_vq += vq.item() * bs
+        total_used_codes += indices.view(-1).unique().numel()
 
     n = len(dataloader.dataset)
-    return total_loss / n, total_recon / n, total_vq / n
+    avg_used_codes = total_used_codes / len(dataloader)
+    return total_loss / n, total_recon / n, total_vq / n, avg_used_codes
 
 def train_vqvae_model(model, train_loader, val_loader, params):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -110,7 +113,7 @@ def train_vqvae_model(model, train_loader, val_loader, params):
         train_loss, train_recon, train_vq, train_used_codes = train_one_epoch(
             model, train_loader, optimizer, recon_loss_fn, device, vq_weight
         )
-        val_loss, val_recon, val_vq = evaluate(
+        val_loss, val_recon, val_vq, val_used_codes = evaluate(
             model, val_loader, recon_loss_fn, device, vq_weight
         )
 
@@ -121,7 +124,7 @@ def train_vqvae_model(model, train_loader, val_loader, params):
         history["val_loss"].append(val_loss)
         history["val_recon_loss"].append(val_recon)
         history["val_vq_loss"].append(val_vq)
-        
+        history["val_used_codes"].append(val_used_codes)
 
         wandb.log({
             "train_loss": float(train_loss),
@@ -131,6 +134,7 @@ def train_vqvae_model(model, train_loader, val_loader, params):
             "val_loss": float(val_loss),
             "val_recon_loss": float(val_recon),
             "val_vq_loss": float(val_vq),
+            "val_used_codes": float(val_used_codes),
             "vq_weight": float(vq_weight),
             "epoch": epoch + 1,
         })

@@ -17,6 +17,7 @@ def to_vis_range(x, params):
     return img.clamp(0, 1)
 
 def kl_loss(mu, logvar):
+    logvar = torch.clamp(logvar, min=-10, max=10)
     return -0.5 * torch.mean(1 + logvar - mu.pow(2) - logvar.exp())
 
 def vae_loss(recon, x, mu, logvar, recon_loss_fn, beta=1.0):

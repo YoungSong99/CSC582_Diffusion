@@ -94,7 +94,7 @@ class VectorQuantizer(nn.Module):
         self.embedding_dim = embedding_dim
         self.commitment_cost = commitment_cost
         self.embedding = nn.Embedding(num_embeddings, embedding_dim)
-        self.embedding.weight.data.uniform_(-1 / num_embeddings, 1 / num_embeddings)
+        nn.init.normal_(self.embedding.weight, mean=0.0, std=0.02)
 
     def forward(self, z):
         z_perm = z.permute(0, 2, 3, 1).contiguous()
@@ -116,9 +116,9 @@ class VectorQuantizer(nn.Module):
 
         quantized = z + (quantized - z).detach()
         indices = indices.view(z.size(0), z.size(2), z.size(3))
+        used_codes = torch.unique(indices).numel()
 
         return quantized, vq_loss, indices
-    
 
 class VQVAE(nn.Module):
     def __init__(
@@ -143,5 +143,5 @@ class VQVAE(nn.Module):
     def forward(self, x):
         z = self.encode(x)
         quantized, vq_loss, indices = self.vq(z)
-        recon = self.decode_from_quantized(quantized)
-        return recon, vq_loss, indices
+        x_recon = self.decode_from_quantized(quantized)
+        return x_recon, vq_loss, indices
