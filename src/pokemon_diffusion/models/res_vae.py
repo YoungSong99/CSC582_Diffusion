@@ -1,39 +1,10 @@
 import torch
 import torch.nn as nn
-
-def get_activation(name):
-    if name == "relu":
-        return nn.ReLU(inplace=True)
-    if name == "silu":
-        return nn.SiLU(inplace=True)
-    if name == "gelu":
-        return nn.GELU()
-    if name in [None, "none"]:
-        return nn.Identity()
-    raise ValueError(f"Unknown activation: {name}")
-
-def get_output_activation(name):
-    if name == "tanh":
-        return nn.Tanh()
-    if name == "sigmoid":
-        return nn.Sigmoid()
-    if name in [None, "none"]:
-        return nn.Identity()
-    raise ValueError(f"Unknown output activation: {name}")
-
-def get_norm_layer(norm_type, num_channels, img_size=None):
-    if norm_type in [None, "none"]:
-        return nn.Identity()
-    if norm_type == "batch":
-        return nn.BatchNorm2d(num_channels)
-    if norm_type == "instance":
-        return nn.InstanceNorm2d(num_channels, affine=True)
-    if norm_type == "group":
-        groups = min(32, num_channels)
-        return nn.GroupNorm(groups, num_channels)
-    if norm_type == "layer":
-        return nn.GroupNorm(1, num_channels)
-    raise ValueError(f"Unknown norm_type: {norm_type}")
+from pokemon_diffusion.models.helper import (
+    get_activation,
+    get_output_activation,
+    get_norm_layer,
+)
 
 class ResBlock(nn.Module):
     def __init__(self, channels, activation="gelu", norm_type="group"):
@@ -84,14 +55,10 @@ class Encoder(nn.Module):
         c = base_channels
         
         self.encoder = nn.Sequential(
-            ConvBlock(3, c, activation, norm_type),
-            ResBlock(c, activation, norm_type),
+            ConvBlock(3, c, activation="none", norm_type="none"),
             ConvBlock(c, c * 2, activation, norm_type),
-            ResBlock(c * 2, activation, norm_type),
             ConvBlock(c * 2, c * 4, activation, norm_type),
-            ResBlock(c * 4, activation, norm_type),
             ConvBlock(c * 4, c * 8, activation, norm_type),
-            ResBlock(c * 8, activation, norm_type),
         )
 
         self.feature_size = img_size // 16
@@ -131,12 +98,7 @@ class Decoder(nn.Module):
             nn.Conv2d(c, 3, 3, 1, 1),
         )
 
-        if output_activation == "tanh":
-            self.output_activation = nn.Tanh()
-        elif output_activation == "sigmoid":
-            self.output_activation = nn.Sigmoid()
-        else:
-            self.output_activation = nn.Identity()
+        self.output_activation = get_output_activation(output_activation)
 
     def forward(self, z):
         h = self.fc_decode(z)
@@ -154,6 +116,7 @@ class VAE(nn.Module):
         self.decoder = Decoder(img_size, latent_dim, activation, norm_type, output_activation, base_channels)
 
     def reparameterize(self, mu, logvar):
+        logvar = torch.clamp(logvar, min=-10, max=10)
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mu + eps * std
