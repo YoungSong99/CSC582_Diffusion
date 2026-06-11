@@ -94,7 +94,7 @@ def train_vae_model(model, train_loader, val_loader, params):
     experiment_name = params.get("experiment_name", "vae_experiment")
     wandb.init(project="pokemon_vae", name=experiment_name, config=params,)
 
-    recon_loss_fn = get_loss_fn(params["training"]["loss"], params)
+    recon_loss_fn = get_loss_fn(params["training"]["loss"], params).to(device)
     beta = params["training"].get("beta", 1.0)
 
     optimizer = torch.optim.AdamW(
