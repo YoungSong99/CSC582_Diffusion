@@ -41,3 +41,22 @@ ae_history:
 ae_result_img:
   type: kedro_datasets.pillow.ImageDataset
   filepath: data/07_model_output/ae_result_img.png
+
+# VAE
+vae_history:
+  type: json.JSONDataset
+  filepath: data/08_reporting/vae_history.json
+
+vae_result_img:
+  type: pillow.ImageDataset
+  filepath: data/07_model_output/vae_result_img.png
+
+
+# VQVAE
+vqvae_history:
+  type: json.JSONDataset
+  filepath: data/08_reporting/vqvae_history.json
+
+vqvae_result_img:
+  type: pillow.ImageDataset
+  filepath: data/07_model_output/vqvae_result_img.png

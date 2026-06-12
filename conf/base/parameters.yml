@@ -20,25 +20,142 @@ max_samples_per_class: 300
 
 # AE
 ae:
-  experiment_name: "ae_m1_tanh_relu_512"
+  experiment_name: "ae_z1_sig_gelu_512_instance_huber"
   
   data:
     img_size: 96
     batch_size: 128
-    normalization_range: "minus_one_to_one"
+    normalization_range: "zero_to_one"
     num_workers: 2
 
   model:
     latent_dim: 512
     base_channels: 32
-    activation: "relu"
-    norm_type: "none"
-    output_activation: "tanh"
+    activation: "gelu"
+    norm_type: "instance"
+    output_activation: "sigmoid"
 
   training:
     learning_rate: 0.0005
     weight_decay: 0.0001
-    loss: "foreground_l1"
+    loss: "foreground_huber"
     foreground_threshold: 0.99
     foreground_weight: 6.0
     epochs: 100
+
+vae:
+  experiment_name: "vae_res_z1_sig_gelu_512_beta0001_vgg"
+
+  data:
+    img_size: 96
+    batch_size: 128
+    normalization_range: "zero_to_one"
+    num_workers: 2
+
+  model:
+    latent_dim: 512
+    base_channels: 32
+    activation: "gelu"
+    norm_type: "group"
+    output_activation: "sigmoid"
+
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    loss: "foreground_huber_vgg"
+    foreground_threshold: 0.99
+    foreground_weight: 5.0
+    vgg_weight: 0.1
+    beta: 0.0001
+    epochs: 200
+
+vqvae:
+  experiment_name: "vqvae_z1_sig_gelu_512_group_vgg_huber"
+
+  data:
+    img_size: 96
+    batch_size: 128
+    normalization_range: "zero_to_one"
+    num_workers: 2
+
+  model:
+    num_embeddings: 128
+    latent_channels: 128
+    base_channels: 32
+    activation: "gelu"
+    norm_type: "group"
+    output_activation: "sigmoid"
+
+  training:
+    learning_rate: 0.0003
+    weight_decay: 0.00001
+    loss: "foreground_huber"
+    foreground_threshold: 0.99
+    foreground_weight: 5.0
+    vgg_weight: 0.01
+    vq_weight:  0.002
+    commitment_cost: 0.01
+    epochs: 200
+
+cvae:
+  experiment_name: "cvae_z1_sig_gelu_512_group_beta0001"
+
+  data:
+    img_size: 96
+    batch_size: 128
+    normalization_range: "zero_to_one"
+    num_workers: 2
+
+  model:
+    latent_dim: 512
+    base_channels: 64
+    activation: "gelu"
+    norm_type: "group"
+    output_activation: "sigmoid"
+    num_types: 20
+    num_colors: 20
+    num_shapes: 20
+    type_emb_dim: 32
+    color_emb_dim: 16
+    shape_emb_dim: 16
+
+  training:
+    learning_rate: 0.0005
+    weight_decay: 0.0001
+    loss: "foreground_huber"
+    foreground_threshold: 0.99
+    foreground_weight: 6.0
+    perceptual_weight: 0.05
+    perceptual_layer: 16
+    beta: 0.0001
+    epochs: 100
+
+
+conditional_sdvae:
+  experiment_name: "conditional_sdvae"
+
+  data:
+    img_size: 96
+    batch_size: 2
+    normalization_range: "zero_to_one"
+    num_workers: 2
+
+  pretrained:
+    name: "stabilityai/sd-vae-ft-mse"
+
+  model:
+    num_types: 18
+    num_colors: 6
+    num_shapes: 14
+    cond_scale: 0.05
+    color_edit_strength: 1.0
+
+  training:
+    learning_rate: 0.0005
+    weight_decay: 0.0001
+    loss: "foreground_huber"
+    foreground_threshold: 0.99
+    foreground_weight: 5.0
+    kl_beta: 0.0001
+    log_every: 10
+    epochs: 1

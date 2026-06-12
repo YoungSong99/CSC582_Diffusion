@@ -1,0 +1,49 @@
+{
+  "type_id_to_name": {
+    "0": "Bug",
+    "1": "Dark",
+    "2": "Dragon",
+    "3": "Electric",
+    "4": "Fairy",
+    "5": "Fighting",
+    "6": "Fire",
+    "7": "Flying",
+    "8": "Ghost",
+    "9": "Grass",
+    "10": "Ground",
+    "11": "Ice",
+    "12": "Normal",
+    "13": "Poison",
+    "14": "Psychic",
+    "15": "Rock",
+    "16": "Steel",
+    "17": "Water"
+  },
+  "color_id_to_name": {
+    "0": "Blue",
+    "1": "Orange & Brown",
+    "2": "Red",
+    "3": "Red & Purple",
+    "4": "White & Gray",
+    "5": "Yellow & Green"
+  },
+  "shape_id_to_name": {
+    "0": "Armor",
+    "1": "Arms",
+    "2": "Ball",
+    "3": "Blob",
+    "4": "Bug-Wings",
+    "5": "Fish",
+    "6": "Heads",
+    "7": "Humanoid",
+    "8": "Legs",
+    "9": "Quadruped",
+    "10": "Squiggle",
+    "11": "Tentacles",
+    "12": "Upright",
+    "13": "Wings"
+  },
+  "num_types": 18,
+  "num_colors": 6,
+  "num_shapes": 14
+}

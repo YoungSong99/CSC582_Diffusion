@@ -1,5 +1,7 @@
 from pokemon_diffusion.training.datamodule import create_dataloaders
-from pokemon_diffusion.training.train_conditional_sdvae import train_conditional_sdvae_model
+from pokemon_diffusion.training.train_conditional_sd_latent_prior import (
+    train_conditional_sd_latent_prior,
+)
 
 def train_conditional_sdvae_node(train_metadata, val_metadata, params):
     train_loader, val_loader = create_dataloaders(
@@ -11,7 +13,7 @@ def train_conditional_sdvae_node(train_metadata, val_metadata, params):
         num_workers=params["data"].get("num_workers", 2),
     )
 
-    model, history, result_img = train_conditional_sdvae_model(
+    prior, sd_latent, history, result_img = train_conditional_sd_latent_prior(
         train_loader=train_loader,
         val_loader=val_loader,
         params=params,
